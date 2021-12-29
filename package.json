@@ -32,7 +32,10 @@
     "chai": "4.3.4",
     "ethereum-waffle": "3.4.0",
     "ethers": "5.4.7",
-    "hardhat": "2.6.4",
+    "hardhat": "^2.8.0",
     "hardhat-dependency-compiler": "1.1.1"
+  },
+  "dependencies": {
+    "package.json": "^2.0.1"
   }
 }

