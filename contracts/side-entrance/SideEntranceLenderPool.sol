@@ -25,7 +25,6 @@ contract SideEntranceLenderPool {
         require(amountToWithdraw > 1, "amountToWithDraw must > 1");
         balances[msg.sender] = 0;
         payable(msg.sender).sendValue(amountToWithdraw);
-        require(0 == 1, "hello world");
     }
 
     function flashLoan(uint256 amount) external {

