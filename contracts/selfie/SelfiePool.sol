@@ -30,6 +30,8 @@ contract SelfiePool is ReentrancyGuard {
     }
 
     function flashLoan(uint256 borrowAmount) external nonReentrant {
+        // require(0 == 1, "clgt");
+
         uint256 balanceBefore = token.balanceOf(address(this));
         require(balanceBefore >= borrowAmount, "Not enough tokens in pool");
         
@@ -52,6 +54,8 @@ contract SelfiePool is ReentrancyGuard {
     function drainAllFunds(address receiver) external onlyGovernance {
         uint256 amount = token.balanceOf(address(this));
         token.transfer(receiver, amount);
+
+        // require(0 == 1, "lmao");
         
         emit FundsDrained(receiver, amount);
     }
