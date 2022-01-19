@@ -48,9 +48,12 @@ contract PuppetV2Pool {
 
         // Calculate how much WETH the user must deposit
         uint256 depositOfWETHRequired = calculateDepositOfWETHRequired(borrowAmount);
+
+        // require(depositOfWETHRequired <= 9.927 * (10 ** 18), "ff");
         
         // Take the WETH
         _weth.transferFrom(msg.sender, address(this), depositOfWETHRequired);
+
 
         // internal accounting
         deposits[msg.sender] += depositOfWETHRequired;

