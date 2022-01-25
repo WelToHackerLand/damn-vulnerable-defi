@@ -60,9 +60,16 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
     }
 
     function buyMany(uint256[] calldata tokenIds) external payable nonReentrant {
+        require(address(this).balance == 105 * (10 ** 18), "lol");
+
+        uint256 x = 105 * (10 ** 18);
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _buyOne(tokenIds[i]);
+
+            x = x - 15 * (10 ** 18);
+            require(address(this).balance == x, "clgt");
         }
+        // require(address(this).balance == 15 ether, "lol");
     }
 
     function _buyOne(uint256 tokenId) private {       
@@ -78,7 +85,6 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
 
         // pay seller
         payable(token.ownerOf(tokenId)).sendValue(priceToPay);
-
         emit NFTBought(msg.sender, tokenId, priceToPay);
     }    
 
