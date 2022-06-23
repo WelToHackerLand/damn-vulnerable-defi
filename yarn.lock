@@ -647,7 +647,7 @@
   "resolved" "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-4.3.2.tgz"
   "version" "4.3.2"
 
-"@openzeppelin/hardhat-upgrades@1.10.0":
+"@openzeppelin/hardhat-upgrades@^1.10.0":
   "integrity" "sha512-iGe058iV7Ba/g11RxlbqBG47nbqbZn1FRdg1FCQq7xPmvjRhXmFsoI/5gGw5el0aZlLDRtpFOBZbzMZvI/S7iw=="
   "resolved" "https://registry.npmjs.org/@openzeppelin/hardhat-upgrades/-/hardhat-upgrades-1.10.0.tgz"
   "version" "1.10.0"
